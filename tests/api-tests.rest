@@ -1,0 +1,525 @@
+### Sistema de Gestión de Médicos - Pruebas de API
+### Base URL: http://localhost:3000
+
+# ========================================
+# VARIABLES GLOBALES
+# ========================================
+@baseUrl = http://localhost:3000
+@authToken = {{login.response.body.data.token}}
+@userId = {{login.response.body.data.usuario.id}}
+
+# ========================================
+# 1. AUTENTICACIÓN
+# ========================================
+
+### Registro de nuevo médico
+# @name registro
+POST {{baseUrl}}/api/auth/registro
+Content-Type: application/json
+
+{
+  "email": "dr.nuevo@ejemplo.com",
+  "password": "password123",
+  "nombre": "Ana",
+  "apellido": "Martínez",
+  "especialidad": "Cardiología",
+  "telefono": "+52 55 9999 8888",
+  "direccion": "Av. Insurgentes 500, CDMX",
+  "fechaNacimiento": "1980-05-20"
+}
+
+### Login con médico existente
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "dr.garcia@ejemplo.com",
+  "password": "password123"
+}
+
+### Verificar token
+GET {{baseUrl}}/api/auth/verificar
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# 2. GESTIÓN DE USUARIOS
+# ========================================
+
+### Obtener perfil del usuario
+GET {{baseUrl}}/api/usuarios/perfil
+Authorization: Bearer {{authToken}}
+
+### Actualizar perfil
+PUT {{baseUrl}}/api/usuarios/perfil
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "nombre": "Carlos",
+  "apellido": "García",
+  "especialidad": "Medicina General",
+  "telefono": "+52 55 1234 5678",
+  "direccion": "Av. Reforma 123, Ciudad de México",
+  "fechaNacimiento": "1985-03-15"
+}
+
+### Cambiar contraseña
+PUT {{baseUrl}}/api/usuarios/cambiar-password
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "passwordActual": "password123",
+  "passwordNuevo": "nuevaPassword456"
+}
+
+### Obtener estadísticas del usuario
+GET {{baseUrl}}/api/usuarios/estadisticas
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# 3. GESTIÓN DE PACIENTES
+# ========================================
+
+### Listar todos los pacientes
+GET {{baseUrl}}/api/pacientes?page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### Buscar pacientes
+GET {{baseUrl}}/api/pacientes?search=maria
+Authorization: Bearer {{authToken}}
+
+### Crear nuevo paciente
+# @name crearPaciente
+POST {{baseUrl}}/api/pacientes
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "nombre": "Pedro",
+  "apellido": "Sánchez",
+  "email": "pedro.sanchez@email.com",
+  "telefono": "+52 55 1111 2222",
+  "fechaNacimiento": "1992-08-15",
+  "genero": "masculino",
+  "direccion": "Calle Morelos 789, CDMX",
+  "historialMedico": "Salud general buena, sin antecedentes importantes",
+  "alergias": "Ninguna conocida"
+}
+
+### Obtener paciente por ID
+GET {{baseUrl}}/api/pacientes/{{crearPaciente.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Actualizar paciente
+PUT {{baseUrl}}/api/pacientes/{{crearPaciente.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "nombre": "Pedro",
+  "apellido": "Sánchez",
+  "email": "pedro.sanchez@email.com",
+  "telefono": "+52 55 1111 2222",
+  "fechaNacimiento": "1992-08-15",
+  "genero": "masculino",
+  "direccion": "Calle Morelos 789, CDMX",
+  "historialMedico": "Salud general buena, sin antecedentes importantes. Control de presión arterial.",
+  "alergias": "Ninguna conocida"
+}
+
+### Obtener estadísticas de pacientes
+GET {{baseUrl}}/api/pacientes/estadisticas/resumen
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# 4. GESTIÓN DE CITAS
+# ========================================
+
+### Listar todas las citas
+GET {{baseUrl}}/api/citas?page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### Filtrar citas por estado
+GET {{baseUrl}}/api/citas?estado=programada
+Authorization: Bearer {{authToken}}
+
+### Filtrar citas por fecha
+GET {{baseUrl}}/api/citas?fechaInicio=2024-01-01&fechaFin=2024-12-31
+Authorization: Bearer {{authToken}}
+
+### Crear nueva cita
+# @name crearCita
+POST {{baseUrl}}/api/citas
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "fecha": "2024-12-20",
+  "hora": "15:00",
+  "duracion": 45,
+  "motivo": "Control de diabetes",
+  "estado": "programada",
+  "notas": "Revisar niveles de glucosa y ajustar medicación",
+  "pacienteId": "{{crearPaciente.response.body.data.id}}"
+}
+
+### Obtener cita por ID
+GET {{baseUrl}}/api/citas/{{crearCita.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Actualizar cita
+PUT {{baseUrl}}/api/citas/{{crearCita.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "fecha": "2024-12-20",
+  "hora": "16:00",
+  "duracion": 60,
+  "motivo": "Control de diabetes",
+  "estado": "confirmada",
+  "notas": "Revisar niveles de glucosa y ajustar medicación. Paciente confirmó asistencia."
+}
+
+### Obtener citas para calendario
+GET {{baseUrl}}/api/citas/calendario?mes=12&año=2024
+Authorization: Bearer {{authToken}}
+
+### Obtener próximas citas
+GET {{baseUrl}}/api/citas/proximas
+Authorization: Bearer {{authToken}}
+
+### Obtener estadísticas de citas
+GET {{baseUrl}}/api/citas/estadisticas/resumen
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# 5. GESTIÓN DE GASTOS
+# ========================================
+
+### Listar todos los gastos
+GET {{baseUrl}}/api/gastos?page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### Filtrar gastos por categoría
+GET {{baseUrl}}/api/gastos?categoria=consultorio
+Authorization: Bearer {{authToken}}
+
+### Filtrar gastos por fecha
+GET {{baseUrl}}/api/gastos?fechaInicio=2024-01-01&fechaFin=2024-12-31
+Authorization: Bearer {{authToken}}
+
+### Crear nuevo gasto
+# @name crearGasto
+POST {{baseUrl}}/api/gastos
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "descripcion": "Compra de termómetro digital",
+  "monto": 850.00,
+  "categoria": "equipos",
+  "fecha": "2024-12-15",
+  "notas": "Termómetro digital profesional para consultorio"
+}
+
+### Obtener gasto por ID
+GET {{baseUrl}}/api/gastos/{{crearGasto.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Actualizar gasto
+PUT {{baseUrl}}/api/gastos/{{crearGasto.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "descripcion": "Compra de termómetro digital profesional",
+  "monto": 950.00,
+  "categoria": "equipos",
+  "fecha": "2024-12-15",
+  "notas": "Termómetro digital profesional para consultorio. Incluye garantía de 2 años."
+}
+
+### Obtener categorías de gastos
+GET {{baseUrl}}/api/gastos/categorias
+Authorization: Bearer {{authToken}}
+
+### Obtener estadísticas de gastos
+GET {{baseUrl}}/api/gastos/estadisticas/resumen
+Authorization: Bearer {{authToken}}
+
+### Obtener gastos por categoría
+GET {{baseUrl}}/api/gastos/estadisticas/por-categoria
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# 6. GESTIÓN DE INGRESOS
+# ========================================
+
+### Listar todos los ingresos
+GET {{baseUrl}}/api/ingresos?page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### Filtrar ingresos por categoría
+GET {{baseUrl}}/api/ingresos?categoria=consulta
+Authorization: Bearer {{authToken}}
+
+### Filtrar ingresos por fecha
+GET {{baseUrl}}/api/ingresos?fechaInicio=2024-01-01&fechaFin=2024-12-31
+Authorization: Bearer {{authToken}}
+
+### Crear nuevo ingreso
+# @name crearIngreso
+POST {{baseUrl}}/api/ingresos
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "descripcion": "Consulta médica - Pedro Sánchez",
+  "monto": 1200.00,
+  "categoria": "consulta",
+  "fecha": "2024-12-15",
+  "metodoPago": "efectivo",
+  "pacienteId": "{{crearPaciente.response.body.data.id}}",
+  "citaId": "{{crearCita.response.body.data.id}}"
+}
+
+### Obtener ingreso por ID
+GET {{baseUrl}}/api/ingresos/{{crearIngreso.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Actualizar ingreso
+PUT {{baseUrl}}/api/ingresos/{{crearIngreso.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "descripcion": "Consulta médica - Pedro Sánchez",
+  "monto": 1200.00,
+  "categoria": "consulta",
+  "fecha": "2024-12-15",
+  "metodoPago": "tarjeta",
+  "pacienteId": "{{crearPaciente.response.body.data.id}}",
+  "citaId": "{{crearCita.response.body.data.id}}"
+}
+
+### Obtener categorías de ingresos
+GET {{baseUrl}}/api/ingresos/categorias
+Authorization: Bearer {{authToken}}
+
+### Obtener estadísticas de ingresos
+GET {{baseUrl}}/api/ingresos/estadisticas/resumen
+Authorization: Bearer {{authToken}}
+
+### Obtener ingresos por categoría
+GET {{baseUrl}}/api/ingresos/estadisticas/por-categoria
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# 7. GESTIÓN DE RECETAS
+# ========================================
+
+### Listar todas las recetas
+GET {{baseUrl}}/api/recetas?page=1&limit=10
+Authorization: Bearer {{authToken}}
+
+### Filtrar recetas por paciente
+GET {{baseUrl}}/api/recetas?pacienteId={{crearPaciente.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Crear nueva receta
+# @name crearReceta
+POST {{baseUrl}}/api/recetas
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "diagnostico": "Diabetes mellitus tipo 2",
+  "medicamentos": "Metformina 500mg - 2 tabletas con cada comida\nGlimepirida 1mg - 1 tableta en la mañana",
+  "indicaciones": "Tomar con las comidas. Monitorear glucosa en ayunas.",
+  "observaciones": "Continuar con dieta y ejercicio. Evitar azúcares simples.",
+  "proximaCita": "2025-01-15T10:00:00.000Z",
+  "pacienteId": "{{crearPaciente.response.body.data.id}}"
+}
+
+### Obtener receta por ID
+GET {{baseUrl}}/api/recetas/{{crearReceta.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Actualizar receta
+PUT {{baseUrl}}/api/recetas/{{crearReceta.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "diagnostico": "Diabetes mellitus tipo 2 controlada",
+  "medicamentos": "Metformina 500mg - 2 tabletas con cada comida\nGlimepirida 1mg - 1 tableta en la mañana",
+  "indicaciones": "Tomar con las comidas. Monitorear glucosa en ayunas. Controlar peso semanalmente.",
+  "observaciones": "Continuar con dieta y ejercicio. Evitar azúcares simples. Mejorar control glucémico.",
+  "proximaCita": "2025-01-15T10:00:00.000Z",
+  "pacienteId": "{{crearPaciente.response.body.data.id}}"
+}
+
+### Descargar receta en PDF
+GET {{baseUrl}}/api/recetas/{{crearReceta.response.body.data.id}}/pdf
+Authorization: Bearer {{authToken}}
+
+### Obtener estadísticas de recetas
+GET {{baseUrl}}/api/recetas/estadisticas/resumen
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# 8. DASHBOARD
+# ========================================
+
+### Obtener dashboard principal
+GET {{baseUrl}}/api/dashboard?periodo=mes
+Authorization: Bearer {{authToken}}
+
+### Obtener datos para gráficos
+GET {{baseUrl}}/api/dashboard/graficos?tipo=ingresos&periodo=mes
+Authorization: Bearer {{authToken}}
+
+### Obtener datos para gráficos de gastos
+GET {{baseUrl}}/api/dashboard/graficos?tipo=gastos&periodo=mes
+Authorization: Bearer {{authToken}}
+
+### Obtener datos para gráficos de citas
+GET {{baseUrl}}/api/dashboard/graficos?tipo=citas&periodo=mes
+Authorization: Bearer {{authToken}}
+
+### Obtener datos para gráficos de pacientes
+GET {{baseUrl}}/api/dashboard/graficos?tipo=pacientes&periodo=mes
+Authorization: Bearer {{authToken}}
+
+### Obtener alertas y notificaciones
+GET {{baseUrl}}/api/dashboard/alertas
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# 9. REPORTES
+# ========================================
+
+### Generar reporte financiero en Excel
+GET {{baseUrl}}/api/reportes/financiero/excel?fechaInicio=2024-01-01&fechaFin=2024-12-31
+Authorization: Bearer {{authToken}}
+
+### Generar reporte de citas en Excel
+GET {{baseUrl}}/api/reportes/citas/excel?fechaInicio=2024-01-01&fechaFin=2024-12-31
+Authorization: Bearer {{authToken}}
+
+### Generar reporte de pacientes en Excel
+GET {{baseUrl}}/api/reportes/pacientes/excel
+Authorization: Bearer {{authToken}}
+
+### Generar reporte completo en Excel
+GET {{baseUrl}}/api/reportes/completo/excel?fechaInicio=2024-01-01&fechaFin=2024-12-31
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# 10. ELIMINACIONES (CUIDADO)
+# ========================================
+
+### Eliminar receta (CUIDADO: Esta acción no se puede deshacer)
+DELETE {{baseUrl}}/api/recetas/{{crearReceta.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Eliminar ingreso (CUIDADO: Esta acción no se puede deshacer)
+DELETE {{baseUrl}}/api/ingresos/{{crearIngreso.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Eliminar gasto (CUIDADO: Esta acción no se puede deshacer)
+DELETE {{baseUrl}}/api/gastos/{{crearGasto.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Eliminar cita (CUIDADO: Esta acción no se puede deshacer)
+DELETE {{baseUrl}}/api/citas/{{crearCita.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Eliminar paciente (CUIDADO: Esta acción no se puede deshacer)
+DELETE {{baseUrl}}/api/pacientes/{{crearPaciente.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# 11. PRUEBAS DE ERRORES
+# ========================================
+
+### Intentar acceder sin token
+GET {{baseUrl}}/api/pacientes
+
+### Intentar acceder con token inválido
+GET {{baseUrl}}/api/pacientes
+Authorization: Bearer token_invalido
+
+### Intentar crear paciente con datos inválidos
+POST {{baseUrl}}/api/pacientes
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "nombre": "",
+  "apellido": "",
+  "email": "email_invalido"
+}
+
+### Intentar crear cita con fecha pasada
+POST {{baseUrl}}/api/citas
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "fecha": "2020-01-01",
+  "hora": "15:00",
+  "duracion": 30,
+  "motivo": "Test",
+  "pacienteId": "id_invalido"
+}
+
+### Intentar crear gasto con monto negativo
+POST {{baseUrl}}/api/gastos
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "descripcion": "Test",
+  "monto": -100,
+  "categoria": "otros",
+  "fecha": "2024-12-15"
+}
+
+# ========================================
+# 12. PRUEBAS DE RENDIMIENTO
+# ========================================
+
+### Probar paginación de pacientes
+GET {{baseUrl}}/api/pacientes?page=1&limit=5
+Authorization: Bearer {{authToken}}
+
+### Probar búsqueda con filtros múltiples
+GET {{baseUrl}}/api/citas?estado=programada&fechaInicio=2024-12-01&fechaFin=2024-12-31
+Authorization: Bearer {{authToken}}
+
+### Probar estadísticas con diferentes períodos
+GET {{baseUrl}}/api/dashboard?periodo=semana
+Authorization: Bearer {{authToken}}
+
+GET {{baseUrl}}/api/dashboard?periodo=mes
+Authorization: Bearer {{authToken}}
+
+GET {{baseUrl}}/api/dashboard?periodo=año
+Authorization: Bearer {{authToken}}
+
+# ========================================
+# NOTAS IMPORTANTES
+# ========================================
+
+# 1. Asegúrate de que el servidor esté corriendo en http://localhost:3000
+# 2. Ejecuta primero el login para obtener el token de autenticación
+# 3. Las variables {{authToken}} se llenan automáticamente después del login
+# 4. Los IDs de los recursos creados se almacenan en variables para usar en otras pruebas
+# 5. Las pruebas de eliminación están al final para evitar problemas
+# 6. Usa Ctrl+Alt+R para ejecutar todas las pruebas en un archivo
+# 7. Usa Ctrl+Alt+L para ejecutar solo la prueba seleccionada
+# 8. Los archivos PDF y Excel se descargarán automáticamente 

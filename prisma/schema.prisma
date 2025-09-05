@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Usuario (Médico)
+model Usuario {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  nombre    String
+  apellido  String
+  especialidad String?
+  telefono  String?
+  direccion String?
+  fechaNacimiento DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  citas     Cita[]
+  gastos    Gasto[]
+  ingresos  Ingreso[]
+  pacientes Paciente[]
+  recetas   Receta[]
+
+  @@map("usuarios")
+}
+
+// Modelo de Paciente
+model Paciente {
+  id        String   @id @default(cuid())
+  nombre    String
+  apellido  String
+  email     String?
+  telefono  String?
+  fechaNacimiento DateTime?
+  genero    String?
+  direccion String?
+  historialMedico String?
+  alergias  String?
+  estado    String   @default("activo") // activo, inactivo
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  usuarioId String
+
+  // Relaciones
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  citas     Cita[]
+  recetas   Receta[]
+  ingresos  Ingreso[]
+
+  @@map("pacientes")
+}
+
+// Modelo de Cita
+model Cita {
+  id          String   @id @default(cuid())
+  fecha       DateTime
+  hora        String
+  duracion    Int      @default(30) // duración en minutos
+  motivo      String?
+  estado      String   @default("programada") // programada, confirmada, cancelada, completada
+  notas       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  usuarioId   String
+  pacienteId  String
+
+  // Relaciones
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  paciente    Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  ingresos    Ingreso[]
+
+  @@map("citas")
+}
+
+// Modelo de Gasto
+model Gasto {
+  id          String   @id @default(cuid())
+  descripcion String
+  monto       Float
+  categoria   String   // consultorio, equipos, suministros, marketing, otros
+  fecha       DateTime
+  comprobante String?  // URL del archivo
+  notas       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  usuarioId   String
+
+  // Relaciones
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("gastos")
+}
+
+// Modelo de Ingreso
+model Ingreso {
+  id          String   @id @default(cuid())
+  descripcion String
+  monto       Float
+  categoria   String   // consulta, procedimiento, medicamento, otros
+  fecha       DateTime
+  metodoPago  String   @default("efectivo") // efectivo, tarjeta, transferencia
+  pacienteId  String?
+  citaId      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  usuarioId   String
+
+  // Relaciones
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  paciente    Paciente? @relation(fields: [pacienteId], references: [id])
+  cita        Cita?    @relation(fields: [citaId], references: [id])
+
+  @@map("ingresos")
+}
+
+// Modelo de Receta
+model Receta {
+  id          String   @id @default(cuid())
+  fecha       DateTime @default(now())
+  diagnostico String
+  medicamentos String
+  indicaciones String
+  observaciones String?
+  proximaCita DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  usuarioId   String
+  pacienteId  String
+
+  // Relaciones
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  paciente    Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+
+  @@map("recetas")
+} 

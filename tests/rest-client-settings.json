@@ -1,0 +1,34 @@
+{
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "version": "1.0.0"
+    },
+    "local": {
+      "baseUrl": "http://localhost:3000",
+      "email": "dr.garcia@ejemplo.com",
+      "password": "password123"
+    },
+    "development": {
+      "baseUrl": "https://dev-api-sistema-medicos.com",
+      "email": "dev@ejemplo.com",
+      "password": "devPassword123"
+    },
+    "production": {
+      "baseUrl": "https://api-sistema-medicos.com",
+      "email": "prod@ejemplo.com",
+      "password": "prodPassword123"
+    }
+  },
+  "rest-client.defaultHeaders": {
+    "User-Agent": "Sistema-Gestion-Medicos-Tests/1.0.0",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+  },
+  "rest-client.enableTelemetry": false,
+  "rest-client.previewResponseInUntitledDocument": true,
+  "rest-client.saveResponseToFile": true,
+  "rest-client.responseViewerInOutput": true,
+  "rest-client.showResponseHeaders": true,
+  "rest-client.showResponseInNewTab": true,
+  "rest-client.timeoutInMilliseconds": 30000
+} 
