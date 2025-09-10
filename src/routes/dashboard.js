@@ -248,6 +248,21 @@ router.get('/', [
             ? ((pacientesNuevosEsteMes - pacientesNuevosMesAnterior) / pacientesNuevosMesAnterior) * 100 
             : 0,
           
+          citasHoy: await prisma.cita.count({
+            where:{
+              usuarioId: req.user.id,
+              fecha: {
+                gte: moment().startOf('day').toDate(),
+                lte: moment().endOf('day').toDate()
+              },
+              estado:{
+                in:['programada']
+              }
+            }
+          }),
+
+
+
           totalCitasEsteMes,
           citasCompletadasEsteMes,
           citasCanceladasEsteMes,
