@@ -48,23 +48,23 @@ const Dashboard = () => {
   const stats = [
     {
       name: 'Pacientes',
-      value: data.totalPacientes || 0,
-      change: data.nuevosPacientes || 0,
+      value: data.metricas.totalPacientes || 0,
+      change: data.metricas.nuevosPacientes || 0,
       changeType: 'increase',
       icon: Users,
       color: 'primary',
     },
     {
       name: 'Citas Hoy',
-      value: data.citasHoy || 0,
-      change: data.citasPendientes || 0,
+      value: data.metricas.citasHoy || 0,
+      change: data.metricas.citasPendientes || 0,
       changeType: 'pending',
       icon: Calendar,
       color: 'warning',
     },
     {
       name: 'Ingresos del Mes',
-      value: `$${(data.ingresosMes || 0).toLocaleString()}`,
+      value: `$${(data.metricas.totalIngresos || 0).toLocaleString()}`,
       change: data.porcentajeIngresos || 0,
       changeType: 'increase',
       icon: TrendingUp,
@@ -72,7 +72,7 @@ const Dashboard = () => {
     },
     {
       name: 'Gastos del Mes',
-      value: `$${(data.gastosMes || 0).toLocaleString()}`,
+      value: `$${(data.metricas.totalGastos || 0).toLocaleString()}`,
       change: data.porcentajeGastos || 0,
       changeType: 'decrease',
       icon: DollarSign,
